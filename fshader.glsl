@@ -15,8 +15,7 @@ struct ma {
 };
 
 const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 1.0));
-const ma floor_material_1 = ma(0.1, 0.9, 0.8, 10.0, 0.1, vec3(1.0));
-const ma floor_material_2 = ma(0.1, 0.9, 0.8, 10.0, 0.1, vec3(0.5));
+float FLOOR_GRID_SIZE = 0.8;
 
 float origin_sphere(vec3 p, float radius) {
     return length(p) - radius;
@@ -42,20 +41,43 @@ void closest_material(inout float dist, inout ma mat, float new_dist, ma new_mat
     }
 }
 
+float center_mod(float v, float m) {
+    return mod(v - 0.5 * m, m) - 0.5 * m;
+}
+
+float center_div(float v, float m) {
+    return v - 0.5 * m - center_mod(v, m);
+}
+
+float muted_col(float x) {
+    return 0.3 + 0.7 * x;
+}
+
 ma floor_material(vec3 p) {
-    float grid_size = 0.8;
-    float xmod = floor(mod(p.x / grid_size, 2.0));
-    float zmod = floor(mod(p.z / grid_size, 2.0));
-    if (mod(xmod + zmod, 2.0) < 1.0) {
-        return floor_material_1;
-    } else {
-        return floor_material_2;
-    }
+    float xdiv = center_div(p.x, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
+    float zdiv = center_div(p.z, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
+    float r = muted_col(sin(xdiv * 1.2));
+    float g = muted_col(sin(zdiv * 1.3));
+    float b = muted_col(sin(xdiv + zdiv));
+    vec3 col = vec3(r, g, b);
+    return ma(0.1, 0.9, 0.8, 10.0, 0.1, col);
 }
 
 float repeated_boxes_xyz(vec3 p, vec3 dimensions, float corner_radius, vec3 modulo) {
     vec3 q = mod(p - 0.5 * modulo, modulo) - 0.5 * modulo;
     return origin_box(q, dimensions, corner_radius);
+}
+
+float repeated_boxes_xz(vec3 p, vec3 dimensions, float corner_radius, float modulo, float height) {
+    vec3 q = vec3(
+        center_mod(p.x, modulo),
+        p.y - height,
+        center_mod(p.z, modulo));
+    return origin_box(q, dimensions, corner_radius);
+}
+
+float tiles(vec3 p) {
+    return repeated_boxes_xz(p, vec3(FLOOR_GRID_SIZE * 0.42), FLOOR_GRID_SIZE * 0.07, FLOOR_GRID_SIZE, -2);
 }
 
 float fancy_object(vec3 p) {
@@ -84,7 +106,7 @@ float floor_plane(vec3 p) {
 
 float scene(vec3 p) {
     float dist = twisted_object(p);
-    dist = min(dist, floor_plane(p));
+    dist = min(dist, tiles(p));
     return dist;
 }
 
