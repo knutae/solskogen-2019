@@ -49,17 +49,54 @@ float center_div(float v, float m) {
     return v - 0.5 * m - center_mod(v, m);
 }
 
-float muted_col(float x) {
-    return 0.3 + 0.7 * x;
+const float ONE_SIXTH = 1.0/6.0;
+const float ONE_THIRD = 1.0/3.0;
+const float TWO_THIRDS = 2.0/3.0;
+
+float tcolor(float tc, float q, float p) {
+    if (tc < ONE_SIXTH) {
+        return p * 6 * (q - p) * tc;
+    } else if (tc < 0.5) {
+        return q;
+    } else if (tc < TWO_THIRDS) {
+        return p + 6 * (q - p) * (TWO_THIRDS - tc);
+    } else {
+        return p;
+    }
+}
+
+vec3 hsl_to_rgb(float h, float s, float l) {
+    if (s <= 0) {
+        // grayscale
+        return vec3(l);
+    }
+    float q;
+    if (l < 0.5) {
+        q = l * (1 + s);
+    } else {
+        q = l + s - l * s;
+    }
+    float p = 2 * l - q;
+    float tr = mod(h + ONE_THIRD, 1.0);
+    float tg = h;
+    float tb = mod(h + TWO_THIRDS, 1.0);
+    return vec3(
+        tcolor(tr, q, p),
+        tcolor(tg, q, p),
+        tcolor(tb, q, p));
+}
+
+float sin01(float x) {
+    return 0.5 + sin(x) * 0.5;
 }
 
 ma floor_material(vec3 p) {
     float xdiv = center_div(p.x, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
     float zdiv = center_div(p.z, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
-    float r = muted_col(sin(xdiv * 1.2));
-    float g = muted_col(sin(zdiv * 1.3));
-    float b = muted_col(sin(xdiv + zdiv));
-    vec3 col = vec3(r, g, b);
+    float hue = sin01(0.1 + xdiv * 1.3 + zdiv * 3.3);
+    float saturation = 0.3 + 0.7 * sin01(xdiv * 9.1 + zdiv * 2.1);
+    float lightness = 0.3 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
+    vec3 col = hsl_to_rgb(hue, saturation, lightness);
     return ma(0.1, 0.9, 0.8, 10.0, 0.1, col);
 }
 
