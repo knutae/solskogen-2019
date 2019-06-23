@@ -1,9 +1,15 @@
 //#define USE_START 1
-//#define API_CHECK 1
+#if defined(DEBUG)
+#define API_CHECK 1
+#endif
 
 #include <GLES3/gl32.h>
 #include <gtk/gtk.h>
+#if defined(DEBUG)
+#include "gen/shaders-debug.h"
+#else
 #include "gen/shaders.h"
+#endif
 
 const char * EMPTY_SHADER = "void main(){}";
 
