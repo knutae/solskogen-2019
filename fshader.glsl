@@ -11,10 +11,10 @@ struct ma {
     float P; // specular
     float S; // shininess
     float R; // reflection
-    vec3 C; // color
+    vec3 C; // HSL color
 };
 
-const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 1.0));
+const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 0.5));
 float FLOOR_GRID_SIZE = 0.8;
 
 float origin_sphere(vec3 p, float radius) {
@@ -96,7 +96,7 @@ ma floor_material(vec3 p) {
     float hue = sin01(0.1 + xdiv * 1.3 + zdiv * 3.3);
     float saturation = 0.3 + 0.7 * sin01(xdiv * 9.1 + zdiv * 2.1);
     float lightness = 0.3 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
-    vec3 col = hsl_to_rgb(hue, saturation, lightness);
+    vec3 col = vec3(hue, saturation, lightness);
     return ma(0.1, 0.9, 0.8, 10.0, 0.1, col);
 }
 
@@ -198,6 +198,7 @@ float soft_shadow(vec3 p, vec3 light_direction, float sharpness) {
     return res;
 }
 
+// Background color (RGB, not HSL)
 const vec3 background_color = vec3(0.8, 0.9, 1.0);
 
 vec3 apply_fog(vec3 color, float total_distance) {
@@ -211,7 +212,8 @@ vec3 phong_lighting(vec3 p, ma mat, vec3 ray_direction) {
     float diffuse = max(0.0, mat.D * dot(normal, -light_direction)) * shadow;
     vec3 reflection = ray_reflection(ray_direction, normal);
     float specular = pow(max(0.0, mat.P * dot(reflection, -light_direction)), mat.S) * shadow;
-    return mat.C * (diffuse + mat.A) + vec3(specular);
+    float lightness = min(mat.C.z * (diffuse)  + specular, 1.0);
+    return hsl_to_rgb(mat.C.x, mat.C.y, lightness);
 }
 
 vec3 apply_reflections(vec3 color, ma mat, vec3 p, vec3 direction) {
