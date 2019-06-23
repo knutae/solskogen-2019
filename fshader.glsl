@@ -137,10 +137,6 @@ float twisted_object(vec3 p) {
     return fancy_object(q);
 }
 
-float floor_plane(vec3 p) {
-    return horizontal_plane(p, -1.0);
-}
-
 float scene(vec3 p) {
     float dist = twisted_object(p);
     dist = min(dist, tiles(p));
@@ -150,7 +146,7 @@ float scene(vec3 p) {
 ma scene_material(vec3 p) {
     float dist = origin_sphere(p, 1.0); // optimization
     ma mat = blue_material;
-    closest_material(dist, mat, floor_plane(p), floor_material(p));
+    closest_material(dist, mat, tiles(p), floor_material(p));
     return mat;
 }
 
