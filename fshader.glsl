@@ -16,7 +16,7 @@ struct ma {
 
 const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 0.5));
 float FLOOR_GRID_SIZE = 0.8;
-float DRAW_DISTANCE = 10.0;
+float DRAW_DISTANCE = 100.0;
 
 float origin_sphere(vec3 p, float radius) {
     return length(p) - radius;
@@ -153,7 +153,7 @@ ma scene_material(vec3 p) {
 
 bool ray_march(inout vec3 p, vec3 direction) {
     float total_dist = 0.0;
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 500; i++) {
         float dist = scene(p);
         if (dist < 0.001) {
             return true;
@@ -203,7 +203,7 @@ float soft_shadow(vec3 p, vec3 light_direction, float sharpness) {
 const vec3 background_color = vec3(0.8, 0.9, 1.0);
 
 vec3 apply_fog(vec3 color, float total_distance) {
-    return mix(color, background_color, min(1.0, total_distance / DRAW_DISTANCE));
+    return mix(color, background_color, 1.0 - exp(-0.05 * total_distance));
 }
 
 vec3 phong_lighting(vec3 p, ma mat, vec3 ray_direction) {
