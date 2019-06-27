@@ -15,8 +15,9 @@ struct ma {
 };
 
 const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 0.5));
-float FLOOR_GRID_SIZE = 0.8;
+float BOX_SIZE = 0.8;
 float DRAW_DISTANCE = 100.0;
+float SPHERE_SIZE = 1.5;
 
 float origin_sphere(vec3 p, float radius) {
     return length(p) - radius;
@@ -29,6 +30,10 @@ float horizontal_plane(vec3 p, float height) {
 float origin_box(vec3 p, vec3 dimensions, float corner_radius) {
     vec3 a = abs(p);
     return length(max(abs(p) - dimensions, 0.0)) - corner_radius;
+}
+
+float infinite_box(vec2 p2, vec2 size) {
+    return length(max(abs(p2) - size + vec2(0.05), 0.0)) - 0.05;
 }
 
 float csg_subtraction(float dist1, float dist2) {
@@ -92,8 +97,8 @@ float sin01(float x) {
 }
 
 ma floor_material(vec3 p) {
-    float xdiv = center_div(p.x, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
-    float zdiv = center_div(p.z, FLOOR_GRID_SIZE) / FLOOR_GRID_SIZE;
+    float xdiv = center_div(p.x, BOX_SIZE) / BOX_SIZE;
+    float zdiv = center_div(p.z, BOX_SIZE) / BOX_SIZE;
     float hue = sin01(0.1 + xdiv * 1.3 + zdiv * 3.3);
     float saturation = 0.3 + 0.7 * sin01(xdiv * 9.1 + zdiv * 2.1);
     float lightness = 0.3 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
@@ -114,15 +119,23 @@ float repeated_boxes_xz(vec3 p, vec3 dimensions, float corner_radius, float modu
     return origin_box(q, dimensions, corner_radius);
 }
 
-float tiles(vec3 p) {
-    return repeated_boxes_xz(p, vec3(FLOOR_GRID_SIZE * 0.42), FLOOR_GRID_SIZE * 0.07, FLOOR_GRID_SIZE, -2);
+float box_landscape(vec3 q) {
+    vec3 p = vec3(q.x, q.y - BOX_SIZE * 0.5, q.z);
+    float cubes = max(
+        repeated_boxes_xyz(p, vec3(BOX_SIZE * 0.42), BOX_SIZE * 0.07, vec3(BOX_SIZE)),
+        horizontal_plane(p, -BOX_SIZE * 0.5)
+    );
+    float valley = csg_subtraction(
+        cubes,
+        infinite_box(p.xy, vec2(BOX_SIZE * 2.5, BOX_SIZE * 2.5))
+    );
+    return valley;
 }
 
 float fancy_object(vec3 p) {
-    float sphere_size = 1.5;
     float hollow_sphere = csg_subtraction(
-        origin_sphere(p, sphere_size),
-        origin_sphere(p, sphere_size * 0.98));
+        origin_sphere(p, SPHERE_SIZE),
+        origin_sphere(p, SPHERE_SIZE * 0.98));
     float grid_size = 0.2;
     return csg_subtraction(
         hollow_sphere,
@@ -140,20 +153,21 @@ float twisted_object(vec3 p) {
 
 float scene(vec3 p) {
     float dist = twisted_object(p);
-    dist = min(dist, tiles(p));
+    dist = min(dist, box_landscape(p));
     return dist;
 }
 
 ma scene_material(vec3 p) {
-    float dist = origin_sphere(p, 1.0); // optimization
+    //float dist = twisted_object(p);
+    float dist = origin_sphere(p, SPHERE_SIZE); // optimization
     ma mat = blue_material;
-    closest_material(dist, mat, tiles(p), floor_material(p));
+    closest_material(dist, mat, box_landscape(p), floor_material(p));
     return mat;
 }
 
 bool ray_march(inout vec3 p, vec3 direction) {
     float total_dist = 0.0;
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 5000; i++) {
         float dist = scene(p);
         if (dist < 0.001) {
             return true;
