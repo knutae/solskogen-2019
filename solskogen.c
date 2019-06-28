@@ -86,6 +86,12 @@ void realize(GtkGLArea *area) {
   glUniform1f(1, 0.0);
 }
 
+void key_press(GtkWidget * widget, GdkEventKey * event) {
+  if (event->keyval == GDK_KEY_Escape) {
+    gtk_main_quit();
+  }
+}
+
 #ifdef USE_START
 void _start()
 #else
@@ -101,6 +107,7 @@ int main()
 
   g_signal_connect (area, "realize", G_CALLBACK (realize), NULL);
   g_signal_connect (area, "render", G_CALLBACK (render), NULL);
+  g_signal_connect (window, "key-press-event", G_CALLBACK(key_press), NULL);
 
   gtk_widget_show_all(window);
 
