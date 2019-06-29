@@ -39,7 +39,27 @@ obj/%-debug.o: %.c gen/shaders-debug.h
 
 bin/%: obj/%.o
 	@mkdir -p bin
-	$(CC) -o $@ $^ $(LIBS)
+	#$(CC) -o $@ $^ $(LIBS)
+	ld \
+		-z norelro \
+		-z nodelete \
+		-z noseparate-code \
+		-O1 \
+		--orphan-handling=discard \
+		--as-needed \
+		--no-demangle \
+		--gc-sections \
+		--hash-style=gnu \
+		--no-eh-frame-hdr \
+		--no-ld-generated-unwind-info \
+		-m elf_x86_64 \
+		-dynamic-linker \
+		/lib64/ld-linux-x86-64.so.2 \
+		-o $@ \
+		/usr/lib/x86_64-linux-gnu/crt1.o \
+		$^ \
+		$(LIBS) \
+		-lc
 	../ELFkickers/bin/sstrip $@
 
 bin/%-debug: obj/%-debug.o
