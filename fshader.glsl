@@ -121,15 +121,31 @@ float repeated_boxes_xz(vec3 p, vec3 dimensions, float corner_radius, float modu
     return origin_box(q, dimensions, corner_radius);
 }
 
+float sky_boxes(vec3 p, vec3 size) {
+    float modulo = BOX_SIZE * 10;
+    vec3 q = vec3(
+        mod(p.x - 0.5 * modulo, modulo) - 0.5 * modulo,
+        mod(p.y - BOX_SIZE * 5 - 0.5 * modulo, modulo) - 0.5 * modulo,
+        mod(p.z - 0.5 * modulo, modulo) - 0.5 * modulo
+    );
+    return origin_box(q, size * BOX_SIZE * 0.5 - vec3(0.07), 0.07);
+}
+
 float box_landscape(vec3 q) {
     vec3 p = vec3(q.x, q.y - BOX_SIZE * 0.5, q.z);
     float cubes = max(
         repeated_boxes_xyz(p, vec3(BOX_SIZE * 0.42), BOX_SIZE * 0.07, vec3(BOX_SIZE)),
-        horizontal_plane(p, -BOX_SIZE * 0.5)
-    );
+        min(
+            horizontal_plane(p, -BOX_SIZE * 0.5),
+            min(
+                sky_boxes(p, vec3(3,1,3)),
+                min(
+                    sky_boxes(p, vec3(1,3,3)),
+                    sky_boxes(p, vec3(1,1,5))
+    ))));
     float valley = csg_subtraction(
         cubes,
-        infinite_box(p.xy, vec2(BOX_SIZE * 2.5, BOX_SIZE * 2.5))
+        infinite_box(vec2(p.x, p.y + BOX_SIZE), vec2(BOX_SIZE * 2.5, BOX_SIZE * 1.5))
     );
     return valley;
 }
