@@ -150,34 +150,14 @@ float box_landscape(vec3 q) {
     return valley;
 }
 
-float fancy_object(vec3 p) {
-    float hollow_sphere = csg_subtraction(
-        origin_sphere(p, SPHERE_SIZE),
-        origin_sphere(p, SPHERE_SIZE * 0.98));
-    float grid_size = 0.2;
-    return csg_subtraction(
-        hollow_sphere,
-        repeated_boxes_xyz(p, vec3(grid_size * 0.4), grid_size * 0.05, vec3(grid_size)));
-}
-
-float twisted_object(vec3 p) {
-    float amount = 0.3;
-    float c = cos(amount * p.y);
-    float s = sin(amount * p.y);
-    mat2 m = mat2(c, -s, s, c);
-    vec3 q = vec3(m * p.xz, p.y);
-    return fancy_object(q);
-}
-
 float scene(vec3 p) {
-    float dist = twisted_object(p);
+    float dist = origin_sphere(p, SPHERE_SIZE);
     dist = min(dist, box_landscape(p));
     return dist;
 }
 
 ma scene_material(vec3 p) {
-    //float dist = twisted_object(p);
-    float dist = origin_sphere(p, SPHERE_SIZE); // optimization
+    float dist = origin_sphere(p, SPHERE_SIZE);
     ma mat = blue_material;
     closest_material(dist, mat, box_landscape(p), box_material(p));
     return mat;
