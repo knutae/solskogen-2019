@@ -14,7 +14,6 @@ struct ma {
     vec3 C; // HSL color
 };
 
-const ma blue_material = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 0.5));
 float BOX_SIZE = 0.8;
 float DRAW_DISTANCE = 200.0;
 float SPHERE_SIZE = 1.5;
@@ -158,7 +157,7 @@ float scene(vec3 p) {
 
 ma scene_material(vec3 p) {
     float dist = origin_sphere(p, SPHERE_SIZE);
-    ma mat = blue_material;
+    ma mat = ma(0.1, 0.9, 0.8, 6.0, 0.3, vec3(0.5, 0.5, 0.5));
     closest_material(dist, mat, box_landscape(p), box_material(p));
     return mat;
 }
