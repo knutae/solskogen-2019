@@ -223,7 +223,7 @@ vec3 phong_lighting(vec3 p, ma mat, vec3 ray_direction) {
 
 vec3 apply_reflections(vec3 color, ma mat, vec3 p, vec3 direction) {
     float reflection = mat.R;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 3; i++) {
         if (reflection <= 0.01) {
             break;
         }
@@ -245,9 +245,7 @@ vec3 apply_reflections(vec3 color, ma mat, vec3 p, vec3 direction) {
     return color;
 }
 
-void main() {
-    float u = C.x - 1.0;
-    float v = (C.y - 1.0) * H / W;
+vec3 render(float u, float v) {
     vec3 eye_position = vec3(0, 2, 4);
     vec3 forward = normalize(vec3(0, 0, -3) - eye_position);
     vec3 up = vec3(0.0, 1.0, 0.0);
@@ -257,11 +255,33 @@ void main() {
     vec3 start_pos = eye_position + forward * focal_length + right * u + up * v;
     vec3 direction = normalize(start_pos - eye_position);
     vec3 p = start_pos;
-    F = background_color;
+    vec3 color = background_color;
     if (ray_march(p, direction)) {
         ma mat = scene_material(p);
-        F = phong_lighting(p, mat, direction);
-        F = apply_reflections(F, mat, p, direction);
-        F = apply_fog(F, length(p - start_pos));
+        color = phong_lighting(p, mat, direction);
+        color = apply_reflections(color, mat, p, direction);
+        color = apply_fog(color, length(p - start_pos));
     }
+    return color;
+}
+
+vec3 render_aa(float u, float v) {
+    // Antialiasing: render and blend 2x2 points per pixel.
+    // That means the distance between points is 1/2 pixel,
+    // and the distance from the center (du, dv) is 1/4 pixel.
+    // Each pixel size is (2.0 / W, 2.0 / H) since the full area is -1 to 1.
+    float du = 2.0 / W / 4.0;
+    float dv = 2.0 / H / 4.0;
+    vec3 sum =
+        render(u - du, v - dv) +
+        render(u - du, v + dv) +
+        render(u + du, v - dv) +
+        render(u + du, v + dv);
+    return sum / 4;
+}
+
+void main() {
+    float u = C.x - 1.0;
+    float v = (C.y - 1.0) * H / W;
+    F = render_aa(u, v);
 }
