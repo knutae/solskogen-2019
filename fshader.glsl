@@ -241,9 +241,11 @@ vec3 apply_reflections(vec3 color, ma mat, vec3 p, vec3 direction) {
         }
         vec3 reflection_color = background_color;
         direction = ray_reflection(direction, estimate_normal(p));
+        vec3 start_pos = p;
         p += 0.05 * direction;
         if (ray_march(p, direction)) {
             reflection_color = phong_lighting(p, scene_material(p), direction);
+            reflection_color = apply_fog(reflection_color, length(p - start_pos));
             color = mix(color, reflection_color, reflection);
             mat = scene_material(p);
             reflection *= mat.R;
