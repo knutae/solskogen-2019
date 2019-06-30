@@ -123,9 +123,9 @@ float repeated_boxes_xz(vec3 p, vec3 dimensions, float corner_radius, float modu
 float sky_boxes(vec3 p, vec3 size) {
     float modulo = BOX_SIZE * 10;
     vec3 q = vec3(
-        mod(p.x - 0.5 * modulo, modulo) - 0.5 * modulo,
-        mod(p.y - BOX_SIZE * 5 - 0.5 * modulo, modulo) - 0.5 * modulo,
-        mod(p.z - 0.5 * modulo, modulo) - 0.5 * modulo
+        center_mod(p.x, modulo),
+        center_mod(p.y - BOX_SIZE * 5, modulo),
+        center_mod(p.z, modulo)
     );
     return origin_box(q, size * BOX_SIZE * 0.5 - vec3(0.07), 0.07);
 }
