@@ -112,14 +112,6 @@ float repeated_boxes_xyz(vec3 p, vec3 dimensions, float corner_radius, vec3 modu
     return origin_box(q, dimensions, corner_radius);
 }
 
-float repeated_boxes_xz(vec3 p, vec3 dimensions, float corner_radius, float modulo, float height) {
-    vec3 q = vec3(
-        center_mod(p.x, modulo),
-        p.y - height,
-        center_mod(p.z, modulo));
-    return origin_box(q, dimensions, corner_radius);
-}
-
 float sky_boxes(vec3 p, vec3 size) {
     float modulo = BOX_SIZE * 10;
     vec3 q = vec3(
