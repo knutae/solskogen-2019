@@ -256,8 +256,8 @@ vec3 apply_reflections(vec3 color, ma mat, vec3 p, vec3 direction) {
 void main() {
     float u = C.x - 1.0;
     float v = (C.y - 1.0) / A;
-    vec3 eye_position = vec3(0.0, 1.0, 3.0);
-    vec3 forward = normalize(-eye_position);
+    vec3 eye_position = vec3(0, 2, 4);
+    vec3 forward = normalize(vec3(0, 0, -3) - eye_position);
     vec3 up = vec3(0.0, 1.0, 0.0);
     vec3 right = normalize(cross(up, forward));
     up = cross(-right, forward);
