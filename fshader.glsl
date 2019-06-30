@@ -224,7 +224,7 @@ vec3 phong_lighting(vec3 p, ma mat, vec3 ray_direction) {
     float diffuse = max(0.0, mat.D * dot(normal, -light_direction)) * shadow;
     vec3 reflection = ray_reflection(ray_direction, normal);
     float specular = pow(max(0.0, mat.P * dot(reflection, -light_direction)), mat.S) * shadow;
-    float lightness = min(mat.C.z * (diffuse)  + specular, 1.0);
+    float lightness = min(mat.C.z * (diffuse + mat.A) + specular, 1.0);
     return hsl_to_rgb(mat.C.x, mat.C.y, lightness);
 }
 
