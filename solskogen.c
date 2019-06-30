@@ -83,8 +83,6 @@ void realize(GtkGLArea *area) {
   glBindVertexArray(vba);
 
   glUseProgram(program);
-
-  glUniform1f(1, 0.0);
 }
 
 void key_press(GtkWidget * widget, GdkEventKey * event) {
