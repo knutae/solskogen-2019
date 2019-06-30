@@ -42,7 +42,8 @@ GLuint create_shader(const char *source, GLenum type) {
 gboolean render(GtkGLArea *area, GdkGLContext *context) {
   GtkAllocation size;
   gtk_widget_get_allocation(GTK_WIDGET(area), &size);
-  glUniform1f(0, size.width / (double) size.height);
+  glUniform1f(0, size.width);
+  glUniform1f(1, size.height);
   glDrawArrays(GL_POINTS, 0, 1);
   return TRUE;
 }
