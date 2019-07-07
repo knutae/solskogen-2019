@@ -284,6 +284,9 @@ vec3 render_aa(float u, float v) {
 void main() {
     float u = C.x - 1.0;
     float v = (C.y - 1.0) * H / W;
+#if defined(DEBUG)
+    F = render(u, v);
+#else
     F = render_aa(u, v);
-    //F = render(u, v);
+#endif
 }

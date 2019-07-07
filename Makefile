@@ -21,11 +21,19 @@ debug: $(DEBUG_EXE)
 clean:
 	rm -rf bin/ obj/ gen/
 
-gen/shaders.h: fshader.glsl
+gen/%.glsl: %.glsl
+	@mkdir -p gen
+	unifdef -x2 -DNDEBUG -o $@ $<
+
+gen/%-debug.glsl: %.glsl
+	@mkdir -p gen
+	unifdef -x2 -DDEBUG -o $@ $<
+
+gen/shaders.h: gen/fshader.glsl
 	@mkdir -p gen
 	TERM=xterm mono ../Shader_Minifier/shader_minifier.exe --preserve-externals $^ -o $@
 
-gen/shaders-debug.h: fshader.glsl embed-shader.py
+gen/shaders-debug.h: gen/fshader-debug.glsl embed-shader.py
 	@mkdir -p gen
 	python3 embed-shader.py > $@
 

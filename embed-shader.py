@@ -1,7 +1,7 @@
 #!/usr/env/bin python3
 
 SHADERS = {
-    'fshader_glsl': 'fshader.glsl',
+    'fshader_glsl': 'gen/fshader-debug.glsl',
 }
 
 for defname, filename in SHADERS.items():
