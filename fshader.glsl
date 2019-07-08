@@ -169,7 +169,7 @@ float scene(vec3 p) {
 
 ma scene_material(vec3 p) {
     float dist = origin_sphere(p, SPHERE_SIZE);
-    ma mat = ma(0.1, 0.9, 1.5, 6.0, 0.3, vec3(0.5, 0.2, 0.8));
+    ma mat = ma(0.1, 0.9, 1.5, 6.0, 0.5, vec3(0.15, 0.3, 0.8));
     closest_material(dist, mat, silhouette(p), ma(0.1, 0.9, 1.5, 6.0, 0, vec3(0)));
     closest_material(dist, mat, box_landscape(p), box_material(p));
     return mat;
