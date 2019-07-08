@@ -61,7 +61,7 @@ const float TWO_THIRDS = 2.0/3.0;
 
 float tcolor(float tc, float q, float p) {
     if (tc < ONE_SIXTH) {
-        return p * 6 * (q - p) * tc;
+        return p + 6 * (q - p) * tc;
     } else if (tc < 0.5) {
         return q;
     } else if (tc < TWO_THIRDS) {
