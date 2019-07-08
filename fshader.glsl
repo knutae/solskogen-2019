@@ -101,7 +101,7 @@ ma box_material(vec3 q) {
     float xdiv = center_div(p.x, BOX_SIZE) / BOX_SIZE + 5;
     float ydiv = center_div(p.y, BOX_SIZE) / BOX_SIZE + 5;
     float zdiv = center_div(p.z, BOX_SIZE) / BOX_SIZE + 5;
-    float hue = sin01(ydiv * 0.2 + 0.5);
+    float hue = sin01(ydiv * 0.2 + 0.1);
     hue += sin01(abs(xdiv) * 0.05 - 1);
     hue += sin01(-0.001 * zdiv + 0.5);
     hue = mod(hue, 1.0);
