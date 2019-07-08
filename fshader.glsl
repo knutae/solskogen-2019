@@ -146,8 +146,23 @@ float box_landscape(vec3 q) {
     return valley;
 }
 
+float silhouette(vec3 p) {
+    p.y -= 1;
+    p.z += 70;
+    return max(
+        min(
+            origin_sphere(vec3(p.x * 0.8, p.y / 2.8, p.z), 0.3),
+            min(
+                origin_sphere(vec3(p.x, p.y - 0.9, p.z), 0.2),
+                origin_box(
+                    vec3(p.x, p.y + 1, p.z),
+                    vec3(0.15, 0.2, 0.2), 0.05))),
+        origin_box(p, vec3(1, 2, 0.05), 0.05));
+}
+
 float scene(vec3 p) {
     float dist = origin_sphere(p, SPHERE_SIZE);
+    dist = min(dist, silhouette(p));
     dist = min(dist, box_landscape(p));
     return dist;
 }
@@ -155,6 +170,7 @@ float scene(vec3 p) {
 ma scene_material(vec3 p) {
     float dist = origin_sphere(p, SPHERE_SIZE);
     ma mat = ma(0.1, 0.9, 1.5, 6.0, 0.3, vec3(0.5, 0.2, 0.8));
+    closest_material(dist, mat, silhouette(p), ma(0.1, 0.9, 1.5, 6.0, 0, vec3(0)));
     closest_material(dist, mat, box_landscape(p), box_material(p));
     return mat;
 }
