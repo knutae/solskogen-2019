@@ -101,11 +101,14 @@ ma box_material(vec3 q) {
     float xdiv = center_div(p.x, BOX_SIZE) / BOX_SIZE + 5;
     float ydiv = center_div(p.y, BOX_SIZE) / BOX_SIZE + 5;
     float zdiv = center_div(p.z, BOX_SIZE) / BOX_SIZE + 5;
-    float hue = sin01(pow(xdiv, 4.1) + pow(ydiv, 5.12) + pow(zdiv, 2.14));
-    float saturation = 0.3 + 0.5 * sin01(xdiv * 9.1 + zdiv * 2.1);
-    float lightness = 0.3 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
+    float hue = sin01(ydiv * 0.1 + 0.2);
+    hue += sin01(xdiv * 0.01 + 1);
+    //hue += sin01(-0.01 * zdiv);
+    hue = mod(hue, 1.0);
+    float saturation = 0.2 + 0.2 * sin01(xdiv * 9.1 + zdiv * 2.1);
+    float lightness = 0.5 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
     vec3 col = vec3(hue, saturation, lightness);
-    float reflection = 0.5 / max(1.0, p.y * 0.5);
+    float reflection = 0.5 / max(1.0, ydiv * 0.5);
     return ma(0.1, 0.9, 0.8, 10.0, reflection, col);
 }
 
