@@ -77,6 +77,7 @@ void realize(GtkGLArea *area) {
   GLuint vertex_shader = create_shader(EMPTY_SHADER, GL_VERTEX_SHADER);
   GLuint geometry_shader = create_shader(GEOMETRY_SHADER, GL_GEOMETRY_SHADER);
 #ifdef DEBUG
+  system("mkdir -p gen && unifdef -b -x2 -DDEBUG -o gen/fshader-debug.glsl fshader.glsl");
   GLuint fragment_shader = load_shader("gen/fshader-debug.glsl", GL_FRAGMENT_SHADER);
 #else
   GLuint fragment_shader = create_shader(fshader_glsl, GL_FRAGMENT_SHADER);

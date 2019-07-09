@@ -15,7 +15,7 @@ all: $(EXE)
 run: $(EXE)
 	./$(EXE)
 
-debug: $(DEBUG_EXE) gen/fshader-debug.glsl
+debug: $(DEBUG_EXE)
 	./$(DEBUG_EXE)
 
 clean:
@@ -24,10 +24,6 @@ clean:
 gen/%.glsl: %.glsl
 	@mkdir -p gen
 	unifdef -x2 -DNDEBUG -o $@ $<
-
-gen/%-debug.glsl: %.glsl
-	@mkdir -p gen
-	unifdef -b -x2 -DDEBUG -o $@ $<
 
 gen/shaders.h: gen/fshader.glsl
 	@mkdir -p gen
