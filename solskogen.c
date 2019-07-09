@@ -121,6 +121,7 @@ int main()
   gtk_init(NULL, NULL);
   GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   GtkWidget * area = gtk_gl_area_new();
+  gtk_gl_area_set_auto_render(GTK_GL_AREA(area), FALSE);
 
   gtk_container_add(GTK_CONTAINER(window), area);
   gtk_window_fullscreen(GTK_WINDOW(window));
