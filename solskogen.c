@@ -9,15 +9,15 @@
 #include "gen/shaders.h"
 #endif
 
-const char * EMPTY_SHADER = "void main(){}";
+#define EMPTY_SHADER "void main(){}"
 
-const char * GEOMETRY_SHADER =
-  "#version 450\n"
-  "layout(points)in;"
-  "layout(triangle_strip,max_vertices=4)out;"
-  "out vec2 C;"
-  "void E(float u,float v){C=vec2(u+1,v+1);gl_Position=vec4(u,v,0,1);EmitVertex();}"
-  "void main(){E(-1,-1);E(1,-1);E(-1,1);E(1,1);}";
+#define GEOMETRY_SHADER \
+  "#version 450\n" \
+  "layout(points)in;" \
+  "layout(triangle_strip,max_vertices=4)out;" \
+  "out vec2 C;" \
+  "void E(float u,float v){C=vec2(u+1,v+1);gl_Position=vec4(u,v,0,1);EmitVertex();}" \
+  "void main(){E(-1,-1);E(1,-1);E(-1,1);E(1,1);}"
 
 GLuint create_shader(const char *source, GLenum type) {
   GLuint shader = glCreateShader(type);
