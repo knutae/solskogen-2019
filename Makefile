@@ -58,8 +58,7 @@ bin/%: obj/%.o
 		-o $@ \
 		/usr/lib/x86_64-linux-gnu/crt1.o \
 		$^ \
-		$(LIBS) \
-		-lc
+		$(LIBS)
 	../ELFkickers/bin/sstrip $@
 
 bin/%-debug: obj/%-debug.o
