@@ -15,7 +15,7 @@ all: $(EXE)
 run: $(EXE)
 	./$(EXE)
 
-debug: $(DEBUG_EXE)
+debug: $(DEBUG_EXE) gen/fshader-debug.glsl
 	./$(DEBUG_EXE)
 
 clean:
@@ -33,15 +33,11 @@ gen/shaders.h: gen/fshader.glsl
 	@mkdir -p gen
 	TERM=xterm mono ../Shader_Minifier/shader_minifier.exe --preserve-externals $^ -o $@
 
-gen/shaders-debug.h: gen/fshader-debug.glsl embed-shader.py
-	@mkdir -p gen
-	python3 embed-shader.py > $@
-
 obj/%.o: %.c gen/shaders.h
 	@mkdir -p obj
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-obj/%-debug.o: %.c gen/shaders-debug.h
+obj/%-debug.o: %.c
 	@mkdir -p obj
 	$(CC) -c $(CFLAGS) -DDEBUG -o $@ $<
 

@@ -5,9 +5,7 @@
 
 #include <GLES3/gl32.h>
 #include <gtk/gtk.h>
-#if defined(DEBUG)
-#include "gen/shaders-debug.h"
-#else
+#ifndef DEBUG
 #include "gen/shaders.h"
 #endif
 
@@ -48,6 +46,24 @@ gboolean render(GtkGLArea *area, GdkGLContext *context) {
   return TRUE;
 }
 
+#ifdef DEBUG
+GLuint load_shader(const char * filename, GLenum type) {
+  FILE * f = fopen(filename, "r");
+  if (!f) {
+    printf("Failed to open %s\n", filename);
+    exit(1);
+  }
+  fseek(f, 0, SEEK_END);
+  long length = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  char buffer[length + 1];
+  fread(buffer, 1, length, f);
+  buffer[length] = '\0';
+  fclose(f);
+  return create_shader(buffer, type);
+}
+#endif
+
 void realize(GtkGLArea *area) {
   gtk_gl_area_make_current(area);
 #ifdef API_CHECK
@@ -60,7 +76,11 @@ void realize(GtkGLArea *area) {
   GLuint program = glCreateProgram();
   GLuint vertex_shader = create_shader(EMPTY_SHADER, GL_VERTEX_SHADER);
   GLuint geometry_shader = create_shader(GEOMETRY_SHADER, GL_GEOMETRY_SHADER);
+#ifdef DEBUG
+  GLuint fragment_shader = load_shader("gen/fshader-debug.glsl", GL_FRAGMENT_SHADER);
+#else
   GLuint fragment_shader = create_shader(fshader_glsl, GL_FRAGMENT_SHADER);
+#endif
   glAttachShader(program, vertex_shader);
   glAttachShader(program, geometry_shader);
   glAttachShader(program, fragment_shader);
