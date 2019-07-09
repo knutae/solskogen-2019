@@ -27,7 +27,7 @@ gen/%.glsl: %.glsl
 
 gen/%-debug.glsl: %.glsl
 	@mkdir -p gen
-	unifdef -x2 -DDEBUG -o $@ $<
+	unifdef -b -x2 -DDEBUG -o $@ $<
 
 gen/shaders.h: gen/fshader.glsl
 	@mkdir -p gen
