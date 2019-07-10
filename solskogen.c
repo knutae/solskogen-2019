@@ -19,6 +19,18 @@
   "void E(float u,float v){C=vec2(u+1,v+1);gl_Position=vec4(u,v,0,1);EmitVertex();}" \
   "void main(){E(-1,-1);E(1,-1);E(-1,1);E(1,1);}"
 
+#ifndef DEBUG
+// Redefine GTK casting macros as direct casts
+#undef GTK_GL_AREA
+#undef GTK_CONTAINER
+#undef GTK_WINDOW
+#undef GTK_WIDGET
+#define GTK_GL_AREA (GtkGLArea*)
+#define GTK_CONTAINER (GtkContainer*)
+#define GTK_WINDOW (GtkWindow*)
+#define GTK_WIDGET (GtkWidget*)
+#endif
+
 GLuint create_shader(const char *source, GLenum type) {
   GLuint shader = glCreateShader(type);
   glShaderSource(shader, 1, &source, NULL);
