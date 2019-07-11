@@ -110,7 +110,8 @@ ma box_material(vec3 q) {
     float lightness = 0.5 + 0.5 * sin01(xdiv * 3.3 + zdiv * 8.1);
     vec3 col = vec3(hue, saturation, lightness);
     float reflection = 0.5 / max(1.0, ydiv * 0.5);
-    return ma(0.15, 0.85, 0.8, 10.0, reflection, col);
+    float ambient = 0.1 + 0.8 * sin01(xdiv * 101.11 + zdiv * 121.13) / max(1.0, ydiv * 0.5);
+    return ma(ambient, 1.0 - ambient, 0.8, 10.0, reflection, col);
 }
 
 float repeated_boxes_xyz(vec3 p, vec3 dimensions, float corner_radius, vec3 modulo) {
