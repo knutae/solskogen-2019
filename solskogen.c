@@ -120,7 +120,12 @@ void realize(GtkGLArea *area) {
 
 void key_press(GtkWidget * widget, GdkEventKey * event) {
   if (event->keyval == GDK_KEY_Escape) {
+#if defined(DEBUG)
     gtk_main_quit();
+#else
+    // sys_exit_group (exit all threads) syscall
+    asm("mov $231,%rax; mov $0,%rdi; syscall");
+#endif
   }
 }
 
