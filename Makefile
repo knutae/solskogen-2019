@@ -7,6 +7,7 @@ LIBS += -lgtk-3 -lgdk-3 -lgobject-2.0
 
 XZ = xz -c -9e --format=lzma --lzma1=preset=9,lc=0,lp=0,pb=0
 SSTRIP = ./ELFkickers/bin/sstrip
+SHADER_MINIFIER = ./Shader_Minifier/shader_minifier.exe
 
 EXE = bin/solskogen-4k
 DEBUG_EXE = bin/solskogen-debug
@@ -25,13 +26,16 @@ clean:
 $(SSTRIP):
 	cd ELFkickers; make
 
+$(SHADER_MINIFIER):
+	cd Shader_Minifier; TERM=xterm ./compile.bash
+
 gen/%.glsl: %.glsl
 	@mkdir -p gen
 	unifdef -x2 -DNDEBUG -o $@ $<
 
-gen/shaders.h: gen/fshader.glsl
+gen/shaders.h: gen/fshader.glsl $(SHADER_MINIFIER)
 	@mkdir -p gen
-	TERM=xterm mono ../Shader_Minifier/shader_minifier.exe --preserve-externals $^ -o $@
+	TERM=xterm mono $(SHADER_MINIFIER) --preserve-externals $< -o $@
 
 obj/%.o: %.c gen/shaders.h
 	@mkdir -p obj
