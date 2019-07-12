@@ -158,9 +158,9 @@ float silhouette(vec3 p) {
     return csg_subtraction(
         max(
             min(
-                origin_sphere(vec3(p.x * 0.8, p.y / 2.3 - 0.05, p.z), 0.3),
+                infinite_cylinder(vec2(p.x * 0.8, p.y / 2.3 - 0.05), 0.3),
                 min(
-                    origin_sphere(vec3(p.x, p.y - 0.9, p.z), 0.2),
+                    infinite_cylinder(vec2(p.x, p.y - 0.9), 0.2),
                     origin_box(
                         vec3(p.x, p.y + 0.8, p.z),
                         vec3(0.15, 0.25, 0.2), 0.05))),
