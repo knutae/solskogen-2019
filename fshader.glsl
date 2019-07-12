@@ -153,8 +153,8 @@ float box_landscape(vec3 q) {
 }
 
 float silhouette(vec3 p) {
-    p.y -= 1;
-    p.z += 50;
+    p.y += 0.5;
+    p.z -= 8;
     return csg_subtraction(
         max(
             min(
