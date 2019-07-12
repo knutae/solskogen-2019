@@ -1,0 +1,3 @@
+[submodule "ELFkickers"]
+	path = ELFkickers
+	url = https://github.com/BR903/ELFkickers
