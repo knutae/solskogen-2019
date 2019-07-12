@@ -36,6 +36,10 @@ float infinite_box(vec2 p2, vec2 size) {
     return length(max(abs(p2) - size + vec2(0.05), 0.0)) - 0.05;
 }
 
+float infinite_cylinder(vec2 p2, float radius) {
+    return length(p2) - radius;
+}
+
 float csg_subtraction(float dist1, float dist2) {
     return max(dist1, -dist2);
 }
@@ -150,16 +154,20 @@ float box_landscape(vec3 q) {
 
 float silhouette(vec3 p) {
     p.y -= 1;
-    p.z += 70;
-    return max(
-        min(
-            origin_sphere(vec3(p.x * 0.8, p.y / 2.8, p.z), 0.3),
+    p.z += 50;
+    return csg_subtraction(
+        max(
             min(
-                origin_sphere(vec3(p.x, p.y - 0.9, p.z), 0.2),
-                origin_box(
-                    vec3(p.x, p.y + 1, p.z),
-                    vec3(0.15, 0.2, 0.2), 0.05))),
-        origin_box(p, vec3(1, 2, 0.05), 0.05));
+                origin_sphere(vec3(p.x * 0.8, p.y / 2.3 - 0.05, p.z), 0.3),
+                min(
+                    origin_sphere(vec3(p.x, p.y - 0.9, p.z), 0.2),
+                    origin_box(
+                        vec3(p.x, p.y + 0.8, p.z),
+                        vec3(0.15, 0.25, 0.2), 0.05))),
+            origin_box(p, vec3(1, 2, 0.05), 0.05)),
+        min(
+            infinite_cylinder(vec2(p.x + 0.6, p.y + 0.48), 0.4),
+            infinite_cylinder(vec2(p.x - 0.6, p.y + 0.48), 0.4)));
 }
 
 float scene(vec3 p) {
