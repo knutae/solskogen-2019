@@ -6,6 +6,7 @@ LIBS = -lGL
 LIBS += -lgtk-3 -lgdk-3 -lgobject-2.0
 
 XZ = xz -c -9e --format=lzma --lzma1=preset=9,lc=0,lp=0,pb=0
+SSTRIP = ./ELFkickers/bin/sstrip
 
 EXE = bin/solskogen-4k
 DEBUG_EXE = bin/solskogen-debug
@@ -20,6 +21,9 @@ debug: $(DEBUG_EXE)
 
 clean:
 	rm -rf bin/ obj/ gen/
+
+$(SSTRIP):
+	cd ELFkickers; make
 
 gen/%.glsl: %.glsl
 	@mkdir -p gen
@@ -37,7 +41,7 @@ obj/%-debug.o: %.c
 	@mkdir -p obj
 	$(CC) -c $(CFLAGS) -DDEBUG -o $@ $<
 
-bin/%: obj/%.o
+bin/%: obj/%.o $(SSTRIP)
 	@mkdir -p bin
 	#$(CC) -o $@ $^ $(LIBS)
 	ld \
@@ -57,9 +61,9 @@ bin/%: obj/%.o
 		/lib64/ld-linux-x86-64.so.2 \
 		-o $@ \
 		/usr/lib/x86_64-linux-gnu/crt1.o \
-		$^ \
+		$< \
 		$(LIBS)
-	../ELFkickers/bin/sstrip $@
+	$(SSTRIP) $@
 
 bin/%-debug: obj/%-debug.o
 	@mkdir -p bin
