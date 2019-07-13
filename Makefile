@@ -45,7 +45,13 @@ obj/%-debug.o: %.c
 	@mkdir -p obj
 	$(CC) -c $(CFLAGS) -DDEBUG -o $@ $<
 
-bin/%: obj/%.o $(SSTRIP)
+obj/crt1.o:
+	@mkdir -p obj
+	objcopy \
+		--remove-section .eh_frame \
+		/usr/lib/x86_64-linux-gnu/crt1.o $@
+
+bin/%: obj/%.o obj/crt1.o $(SSTRIP)
 	@mkdir -p bin
 	#$(CC) -o $@ $^ $(LIBS)
 	ld \
@@ -64,7 +70,7 @@ bin/%: obj/%.o $(SSTRIP)
 		-dynamic-linker \
 		/lib64/ld-linux-x86-64.so.2 \
 		-o $@ \
-		/usr/lib/x86_64-linux-gnu/crt1.o \
+		obj/crt1.o \
 		$< \
 		$(LIBS)
 	$(SSTRIP) $@
