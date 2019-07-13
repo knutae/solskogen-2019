@@ -70,6 +70,7 @@ GLuint create_shader(const char *source, GLenum type) {
 
 GLuint vba;
 GLuint program;
+GLuint fragment_shader;
 
 gboolean render(GtkGLArea *area, GdkGLContext *context) {
   GtkAllocation size;
@@ -83,7 +84,7 @@ gboolean render(GtkGLArea *area, GdkGLContext *context) {
 }
 
 #ifdef DEBUG
-GLuint load_shader(const char * filename, GLenum type) {
+void load_shader(GLuint shader, const char * filename, GLenum type) {
   FILE * f = fopen(filename, "r");
   if (!f) {
     printf("Failed to open %s\n", filename);
@@ -96,7 +97,15 @@ GLuint load_shader(const char * filename, GLenum type) {
   fread(buffer, 1, length, f);
   buffer[length] = '\0';
   fclose(f);
-  return create_shader(buffer, type);
+  const char * source = buffer;
+  glShaderSource(shader, 1, &source, NULL);
+  glCompileShader(shader);
+  handle_compile_error(shader);
+}
+
+void load_fragment_shader() {
+  system("mkdir -p gen && unifdef -b -x2 -DDEBUG -o gen/fshader-debug.glsl fshader.glsl");
+  load_shader(fragment_shader, "gen/fshader-debug.glsl", GL_FRAGMENT_SHADER);
 }
 #endif
 
@@ -113,10 +122,10 @@ void realize(GtkGLArea *area) {
   GLuint vertex_shader = create_shader(EMPTY_SHADER, GL_VERTEX_SHADER);
   GLuint geometry_shader = create_shader(GEOMETRY_SHADER, GL_GEOMETRY_SHADER);
 #ifdef DEBUG
-  system("mkdir -p gen && unifdef -b -x2 -DDEBUG -o gen/fshader-debug.glsl fshader.glsl");
-  GLuint fragment_shader = load_shader("gen/fshader-debug.glsl", GL_FRAGMENT_SHADER);
+  fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  load_fragment_shader();
 #else
-  GLuint fragment_shader = create_shader(fshader_glsl, GL_FRAGMENT_SHADER);
+  fragment_shader = create_shader(fshader_glsl, GL_FRAGMENT_SHADER);
 #endif
   glAttachShader(program, vertex_shader);
   glAttachShader(program, geometry_shader);
@@ -126,7 +135,7 @@ void realize(GtkGLArea *area) {
   glGenVertexArrays(1, &vba);
 }
 
-void key_press(GtkWidget * widget, GdkEventKey * event) {
+void key_press(GtkWidget * widget, GdkEventKey * event, GtkGLArea * area) {
   if (event->keyval == GDK_KEY_Escape) {
 #if defined(DEBUG)
     gtk_main_quit();
@@ -135,6 +144,14 @@ void key_press(GtkWidget * widget, GdkEventKey * event) {
     asm("mov $231,%rax; mov $0,%rdi; syscall");
 #endif
   }
+#ifdef DEBUG
+  if (event->keyval == GDK_KEY_r) {
+    load_fragment_shader();
+    glLinkProgram(program);
+    handle_link_error(program);
+    gtk_gl_area_queue_render(area);
+  }
+#endif
 }
 
 #ifdef USE_START
@@ -153,7 +170,7 @@ int main()
 
   g_signal_connect (area, "realize", G_CALLBACK (realize), NULL);
   g_signal_connect (area, "render", G_CALLBACK (render), NULL);
-  g_signal_connect (window, "key-press-event", G_CALLBACK(key_press), NULL);
+  g_signal_connect (window, "key-press-event", G_CALLBACK(key_press), area);
 
   gtk_widget_show_all(window);
 
