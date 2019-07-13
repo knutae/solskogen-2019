@@ -1,4 +1,3 @@
-//#define USE_START 1
 #if defined(DEBUG)
 #define API_CHECK 1
 #endif
@@ -154,12 +153,7 @@ void key_press(GtkWidget * widget, GdkEventKey * event, GtkGLArea * area) {
 #endif
 }
 
-#ifdef USE_START
-void _start()
-#else
-int main()
-#endif
-{
+int main() {
   gtk_init(NULL, NULL);
   GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   GtkWidget * area = gtk_gl_area_new();
@@ -175,12 +169,7 @@ int main()
   gtk_widget_show_all(window);
 
   gtk_main();
-#ifdef USE_START
-  // exit syscall (x86_64 asm)
-  asm("mov $60,%rax; mov $0,%rdi; syscall");
-#else
   return 0;
-#endif
 }
 
 #ifndef DEBUG
