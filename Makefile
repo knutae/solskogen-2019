@@ -2,8 +2,8 @@
 CFLAGS = -fomit-frame-pointer -fno-stack-protector -Wall -Werror -Os
 CFLAGS += $(shell pkg-config --cflags gtk+-3.0)
 
-LIBS = -lGL
-LIBS += -lgtk-3 -lgdk-3 -lgobject-2.0
+LIBS = -lGL -lgtk-3 -lgdk-3 -lgobject-2.0
+DEBUG_LIBS = -lGL $(shell pkg-config --libs gtk+-3.0)
 
 XZ = xz -c -9e --format=lzma --lzma1=preset=9,lc=0,lp=0,pb=0
 SSTRIP = ./ELFkickers/bin/sstrip
@@ -71,7 +71,7 @@ bin/%: obj/%.o $(SSTRIP)
 
 bin/%-debug: obj/%-debug.o
 	@mkdir -p bin
-	$(CC) -o $@ $^ $(LIBS)
+	$(CC) -o $@ $^ $(DEBUG_LIBS)
 
 %.xz: %
 	cat $^ | $(XZ) > $@

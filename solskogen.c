@@ -106,6 +106,17 @@ void load_fragment_shader() {
   system("mkdir -p gen && unifdef -b -x2 -DDEBUG -o gen/fshader-debug.glsl fshader.glsl");
   load_shader(fragment_shader, "gen/fshader-debug.glsl", GL_FRAGMENT_SHADER);
 }
+
+void fragment_shader_changed(GFileMonitor * file_monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, GtkGLArea * area) {
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
+    // events seem to come in bursts of three. The done hint should be last.
+    return;
+  }
+  load_fragment_shader();
+  glLinkProgram(program);
+  handle_link_error(program);
+  gtk_gl_area_queue_render(area);
+}
 #endif
 
 void realize(GtkGLArea *area) {
@@ -132,6 +143,12 @@ void realize(GtkGLArea *area) {
   glLinkProgram(program);
   handle_link_error(program);
   glGenVertexArrays(1, &vba);
+
+#ifdef DEBUG
+  GFile * fragment_shader_file = g_file_new_for_path("fshader.glsl");
+  GFileMonitor * file_monitor = g_file_monitor_file(fragment_shader_file, G_FILE_MONITOR_NONE, NULL, NULL);
+  g_signal_connect(file_monitor, "changed", G_CALLBACK(fragment_shader_changed), area);
+#endif
 }
 
 void key_press(GtkWidget * widget, GdkEventKey * event, GtkGLArea * area) {
@@ -143,14 +160,6 @@ void key_press(GtkWidget * widget, GdkEventKey * event, GtkGLArea * area) {
     asm("mov $231,%rax; mov $0,%rdi; syscall");
 #endif
   }
-#ifdef DEBUG
-  if (event->keyval == GDK_KEY_r) {
-    load_fragment_shader();
-    glLinkProgram(program);
-    handle_link_error(program);
-    gtk_gl_area_queue_render(area);
-  }
-#endif
 }
 
 int main() {
