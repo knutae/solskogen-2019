@@ -31,21 +31,40 @@
 #define GTK_WIDGET (GtkWidget*)
 #endif
 
-GLuint create_shader(const char *source, GLenum type) {
-  GLuint shader = glCreateShader(type);
-  glShaderSource(shader, 1, &source, NULL);
-  glCompileShader(shader);
-#ifdef API_CHECK
+#if defined(API_CHECK)
+void handle_compile_error(GLuint shader) {
   GLint success = 0;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     char logBuffer[4096];
     GLsizei length;
     glGetShaderInfoLog(shader, sizeof(logBuffer), &length, logBuffer);
-    printf("Shader compilation failed.\n%s\n", logBuffer);
+    printf("Shader compile error.\n%s\n", logBuffer);
     exit(1);
   }
+}
+
+void handle_link_error(GLuint program) {
+  GLint success = 0;
+  glGetProgramiv(program, GL_LINK_STATUS, &success);
+  if (!success) {
+    char logBuffer[4096];
+    GLsizei length;
+    glGetShaderInfoLog(program, sizeof(logBuffer), &length, logBuffer);
+    printf("Shader link error.\n%s\n", logBuffer);
+    exit(1);
+  }
+}
+#else
+#define handle_compile_error(shader) do {} while(0)
+#define handle_link_error(program) do {} while(0)
 #endif
+
+GLuint create_shader(const char *source, GLenum type) {
+  GLuint shader = glCreateShader(type);
+  glShaderSource(shader, 1, &source, NULL);
+  glCompileShader(shader);
+  handle_compile_error(shader);
   return shader;
 }
 
@@ -103,19 +122,7 @@ void realize(GtkGLArea *area) {
   glAttachShader(program, geometry_shader);
   glAttachShader(program, fragment_shader);
   glLinkProgram(program);
-
-#ifdef API_CHECK
-  GLint success = 0;
-  glGetProgramiv(program, GL_LINK_STATUS, &success);
-  if (!success) {
-    char logBuffer[4096];
-    GLsizei length;
-    glGetShaderInfoLog(program, sizeof(logBuffer), &length, logBuffer);
-    printf("Shader compilation failed.\n%s\n", logBuffer);
-    exit(1);
-  }
-#endif
-
+  handle_link_error(program);
   glGenVertexArrays(1, &vba);
 }
 
