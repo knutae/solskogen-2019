@@ -49,9 +49,14 @@ GLuint create_shader(const char *source, GLenum type) {
   return shader;
 }
 
+GLuint vba;
+GLuint program;
+
 gboolean render(GtkGLArea *area, GdkGLContext *context) {
   GtkAllocation size;
   gtk_widget_get_allocation(GTK_WIDGET(area), &size);
+  glUseProgram(program);
+  glBindVertexArray(vba);
   glUniform1f(0, size.width);
   glUniform1f(1, size.height);
   glDrawArrays(GL_POINTS, 0, 1);
@@ -85,7 +90,7 @@ void realize(GtkGLArea *area) {
   }
 #endif
 
-  GLuint program = glCreateProgram();
+  program = glCreateProgram();
   GLuint vertex_shader = create_shader(EMPTY_SHADER, GL_VERTEX_SHADER);
   GLuint geometry_shader = create_shader(GEOMETRY_SHADER, GL_GEOMETRY_SHADER);
 #ifdef DEBUG
@@ -111,11 +116,7 @@ void realize(GtkGLArea *area) {
   }
 #endif
 
-  GLuint vba;
   glGenVertexArrays(1, &vba);
-  glBindVertexArray(vba);
-
-  glUseProgram(program);
 }
 
 void key_press(GtkWidget * widget, GdkEventKey * event) {
