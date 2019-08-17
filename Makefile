@@ -1,5 +1,5 @@
 
-CFLAGS = -fomit-frame-pointer -fno-stack-protector -Wall -Werror -Os
+CFLAGS = -fno-plt -fno-unwind-tables -Wall -Werror -Oz
 CFLAGS += $(shell pkg-config --cflags gtk+-3.0)
 
 LIBS = -lGL -lgtk-3 -lgdk-3 -lgobject-2.0
