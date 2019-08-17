@@ -182,9 +182,9 @@ int main() {
 }
 
 #ifndef DEBUG
-// Minimal implementations of crt1.o libc functions.
-// With these defined, we don't need to link libc. Probably.
-void __libc_csu_init() {}
-void __libc_csu_fini() {}
-void __libc_start_main() { main(); }
+// Custom _start entry point that doesn't need crt1.o or libc.
+// Still not sure why assembler is needed instead of a C function call.
+void _start() {
+  asm("call main");
+}
 #endif
